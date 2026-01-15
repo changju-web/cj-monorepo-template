@@ -53,6 +53,133 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 └── package.json           # 根配置（开发脚本）
 ```
 
+## Monorepo 迁移记录
+
+### 迁移背景
+
+项目从传统的单应用架构重构为 Monorepo 架构，以支持：
+
+- 多应用管理（web、h5、mini-program 等）
+- 代码复用和共享包管理
+- 统一的构建和部署流程
+
+### 迁移步骤
+
+#### 1. 目录结构调整
+
+```bash
+# 原 vue-pure-admin 结构
+src/
+├── router/
+├── store/
+├── views/
+└── ...
+
+# 迁移后的 Monorepo 结构
+apps/
+└── web/
+    ├── src/          # 原 src 目录内容
+    ├── public/       # 静态资源（需迁移）
+    ├── index.html
+    └── package.json
+packages/              # 共享包（预留）
+```
+
+#### 2. 配置文件迁移
+
+**根 package.json**:
+
+- 移除原有依赖，保留 workspace 配置
+- 添加 `pnpm-workspace.yaml` 定义包结构
+- 通过 `pnpm --filter <app>` 执行子应用命令
+
+**应用 package.json**:
+
+- 原 `package.json` 移至 `apps/web/package.json`
+- 依赖声明保持不变
+- scripts 可独立配置
+
+#### 3. 静态资源处理
+
+**重要**: 需将 `public/` 目录内容复制到 `apps/web/public/`：
+
+```bash
+# 必需的静态资源
+public/
+├── platform-config.json    # 平台配置（必须）
+├── favicon.ico             # 网站图标
+└── logo.svg                # Logo
+```
+
+### 迁移问题及解决方案
+
+#### 问题 1: platform-config.json 加载失败
+
+**现象**: 页面报错 `Cannot read properties of undefined (reading 'replace')`
+
+**原因**:
+
+- `platform-config.json` 位于根目录 `public/`
+- Vite 开发服务器在 `apps/web` 目录运行
+- 请求 `/platform-config.json` 返回 404，fallback 到 `index.html`
+
+**解决方案**:
+
+```bash
+# 创建 web 应用的 public 目录
+mkdir -p apps/web/public
+
+# 复制必要的静态资源
+cp public/platform-config.json apps/web/public/
+cp public/favicon.ico apps/web/public/
+cp public/logo.svg apps/web/public/
+```
+
+#### 问题 2: 依赖安装路径变化
+
+**现象**: 子应用无法访问根目录依赖
+
+**解决方案**:
+
+- 使用 pnpm workspace 提升（hoisting）机制
+- 通用依赖保留在根 `package.json` 的 `devDependencies`
+- 特定应用依赖保留在各自 `package.json` 中
+
+#### 问题 3: 环境变量路径问题
+
+**解决方案**:
+
+- 使用 `import.meta.env` 访问 Vite 环境变量
+- `VITE_PUBLIC_PATH` 配置静态资源基础路径
+- 避免硬编码相对路径
+
+### 迁移检查清单
+
+完成迁移后，请确认：
+
+- [ ] `apps/web/public/` 目录包含所有必需的静态资源
+- [ ] `platform-config.json` 可正常加载（检查网络请求）
+- [ ] 开发服务器启动无报错（`pnpm dev`）
+- [ ] 页面路由跳转正常
+- [ ] 构建产物正确（`pnpm build`）
+- [ ] TypeScript 类型检查通过（`pnpm typecheck`）
+- [ ] 代码格式化检查通过（`pnpm lint`）
+
+### 维护建议
+
+1. **添加新应用时**:
+   - 在 `apps/` 下创建新目录
+   - 复制 `public/` 目录及必需的静态资源
+   - 配置独立的 `package.json` 和 `vite.config.ts`
+
+2. **添加共享包时**:
+   - 在 `packages/` 下创建新包
+   - 通过 `workspace:*` 协议引用
+
+3. **静态资源更新**:
+   - 根目录 `public/` 仅作为参考
+   - 各应用维护自己的 `public/` 目录
+
 ## 常用开发命令
 
 ### 开发与构建
