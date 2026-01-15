@@ -38,8 +38,8 @@
 - **THEN** `pnpm-workspace.yaml` 应包含：
   ```yaml
   packages:
-    - 'apps/*'
-    - 'packages/*'
+    - "apps/*"
+    - "packages/*"
   ```
 
 #### Scenario: 依赖安装

@@ -5,18 +5,21 @@
 当前项目是基于 vue-pure-admin 的单应用管理系统。为了支持未来多应用场景和代码复用，需要重构为 Monorepo 架构。
 
 **约束条件**:
+
 - 必须使用 pnpm 作为包管理器
 - 保持现有构建工具链（Vite、TypeScript、ESLint）
 - 最小化对现有功能的影响
 - 确保 Git 历史保留
 
 **相关方**:
+
 - 开发团队：需要适应新的目录结构
 - CI/CD：需要调整构建和部署流程
 
 ## Goals / Non-Goals
 
 **Goals**:
+
 - 建立 `apps/` 和 `packages/` 目录结构
 - 将现有代码迁移到 `apps/web/`
 - 配置 Monorepo 工作区
@@ -24,6 +27,7 @@
 - 更新文档和开发指南
 
 **Non-Goals**:
+
 - 不引入新的应用（仅 web 应用）
 - 不创建新的共享包
 - 不修改业务逻辑代码
@@ -50,11 +54,13 @@
 ```
 
 **理由**:
+
 - `apps/` 明确区分应用程序
 - `packages/` 预留共享包空间
 - 符合主流 Monorepo 实践（Nx、Turborepo）
 
 **替代方案**:
+
 - 将 `src/` 直接移至根目录：不利于多应用管理
 - 使用 `projects/`：语义不如 `apps/` 清晰
 
@@ -64,11 +70,12 @@
 
 ```yaml
 packages:
-  - 'apps/*'
-  - 'packages/*'
+  - "apps/*"
+  - "packages/*"
 ```
 
 **理由**:
+
 - pnpm 原生支持，无需额外工具
 - 已有项目强制使用 pnpm（preinstall 钩子）
 - 支持工作区内依赖链接
@@ -82,15 +89,16 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html')
+        main: resolve(__dirname, "index.html")
         // 未来可添加更多入口
       }
     }
   }
-})
+});
 ```
 
 **理由**:
+
 - 当前保持单入口，为未来扩展预留空间
 - 支持按需添加新应用入口
 - 构建产物可独立部署
@@ -109,10 +117,12 @@ export default defineConfig({
 ```
 
 **理由**:
+
 - 保持 `@/` 别名不变，减少代码修改
 - 仅调整映射路径
 
 **替代方案**:
+
 - 使用 `@web/*`：需要修改所有导入，工作量较大
 - 使用相对路径：不利于代码可维护性
 
@@ -131,11 +141,13 @@ export default defineConfig({
 ```
 
 **理由**:
+
 - 保持开发体验不变（命令一致）
 - 支持未来多应用构建（`pnpm --filter <app>`）
 - 利用 pnpm workspace 过滤功能
 
 **替代方案**:
+
 - 使用 Turborepo：增加工具复杂度，当前无需
 - 在各应用独立运行：分散管理，不便统一
 
@@ -143,15 +155,16 @@ export default defineConfig({
 
 ### 风险
 
-| 风险 | 影响 | 缓解措施 |
-|------|------|----------|
+| 风险         | 影响         | 缓解措施               |
+| ------------ | ------------ | ---------------------- |
 | Git 历史丢失 | 代码回溯困难 | 使用 `git mv` 保留历史 |
-| 路径别名失效 | 构建失败 | 更新所有配置文件 |
-| 依赖路径错误 | 运行时报错 | 检查 workspace 链接 |
+| 路径别名失效 | 构建失败     | 更新所有配置文件       |
+| 依赖路径错误 | 运行时报错   | 检查 workspace 链接    |
 
 ### 权衡
 
 **复杂度 vs 可扩展性**:
+
 - 增加：Monorepo 配置、workspace 管理
 - 收益：多应用支持、代码复用、统一管理
 
@@ -195,6 +208,7 @@ export default defineConfig({
 ### 回滚方案
 
 如果迁移失败：
+
 1. 使用 `git reflog` 恢复到迁移前提交
 2. 检查点：每个阶段完成后创建 Git 标签
 
