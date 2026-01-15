@@ -12,8 +12,8 @@ export default defineConfig([
     "dist/*",
     "*.d.ts",
     "public/*",
-    "src/assets/**",
-    "src/**/iconfont/**"
+    "apps/web/src/assets/**",
+    "apps/web/src/**/iconfont/**"
   ]),
   {
     ...js.configs.recommended,

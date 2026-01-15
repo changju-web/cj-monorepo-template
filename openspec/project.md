@@ -2,7 +2,7 @@
 
 ## Purpose
 
-基于 **vue-pure-admin** 精简版的企业级前端管理系统脚手架，为构建大型管理后台应用提供最佳实践的技术方案和完善的工程化体系。
+基于 **vue-pure-admin** 精简版的企业级前端管理系统脚手架，采用 **Monorepo 架构**，为构建大型管理后台应用提供最佳实践的技术方案和完善的工程化体系。
 
 项目核心目标：
 
@@ -10,6 +10,26 @@
 - 支持动态路由和静态路由混合模式
 - 优化构建体积和运行时性能
 - 提供完整的代码质量保障体系
+- 支持多应用和共享包管理
+
+### 目录结构
+
+```
+.
+├── apps/                  # 所有应用
+│   └── web/               # 网页端应用
+│       ├── src/           # 源代码
+│       ├── build/         # 构建配置
+│       ├── types/         # 类型定义
+│       ├── mock/          # Mock 数据
+│       ├── index.html     # 入口文件
+│       ├── vite.config.ts # Vite 配置
+│       ├── tsconfig.json  # TypeScript 配置
+│       └── package.json   # 应用依赖
+├── packages/              # 共享包（预留）
+├── pnpm-workspace.yaml    # Workspace 配置
+└── package.json           # 根配置（开发脚本）
+```
 
 ## Tech Stack
 
@@ -94,7 +114,7 @@
 #### 目录结构
 
 ```
-src/
+apps/web/src/
 ├── api/              # API 接口定义
 ├── assets/           # 静态资源
 ├── components/       # 公共组件（Re 前缀）
@@ -114,10 +134,10 @@ src/
 
 #### 路由系统
 
-- **静态路由**: 位于 `src/router/modules/`，通过 Vite 的 `import.meta.glob` 自动导入
+- **静态路由**: 位于 `apps/web/src/router/modules/`，通过 Vite 的 `import.meta.glob` 自动导入
 - **动态路由**: 后端返回，在 `initRouter()` 中处理
 - **路由扁平化**: 三级及以上路由被拍平为二级路由
-- **路由白名单**: 配置在 `src/router/index.ts`，默认包含 `/login`
+- **路由白名单**: 配置在 `apps/web/src/router/index.ts`，默认包含 `/login`
 - **路由守卫**: 在 `router.beforeEach` 中处理登录权限和动态路由加载
 
 #### 状态管理
