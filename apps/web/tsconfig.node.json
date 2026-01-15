@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    /* Node 环境配置 */
+    "target": "ESNext",
+    "module": "ESNext",
+    "lib": ["ESNext"],
+    "types": ["node"],
+    "moduleResolution": "bundler",
+
+    /* 构建脚本配置 */
+    "allowImportingTsExtensions": false,
+    "noEmit": true
+  },
+  "include": [
+    "vite.config.ts",
+    "build/**/*.ts",
+    "build/**/*.d.ts"
+  ]
+}
