@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { PropType } from "vue";
-import { ListItem } from "../data";
-import NoticeItem from "./NoticeItem.vue";
+import { PropType } from 'vue'
+import { ListItem } from '../data'
+import NoticeItem from './NoticeItem.vue'
 
 defineProps({
   list: {
@@ -10,9 +10,9 @@ defineProps({
   },
   emptyText: {
     type: String,
-    default: ""
+    default: ''
   }
-});
+})
 </script>
 
 <template>

@@ -1,0 +1,61 @@
+{
+  "name": "@cj-monorepo/http",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "HTTP 响应适配器 - 基于策略模式的 axios 响应处理工具库",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./adapters": {
+      "types": "./dist/adapters/index.d.ts",
+      "import": "./dist/adapters/index.js"
+    },
+    "./strategies": {
+      "types": "./dist/strategies/index.d.ts",
+      "import": "./dist/strategies/index.js"
+    },
+    "./matchers": {
+      "types": "./dist/matchers/index.d.ts",
+      "import": "./dist/matchers/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test:run": "vitest run"
+  },
+  "keywords": [
+    "axios",
+    "adapter",
+    "strategy",
+    "http",
+    "response",
+    "error",
+    "typescript"
+  ],
+  "author": {
+    "name": "cj-monorepo"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "typescript": "^5.9.3",
+    "vitest": "^3.0.7"
+  },
+  "peerDependencies": {
+    "axios": ">=1.0.0"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.13.0"
+  }
+}

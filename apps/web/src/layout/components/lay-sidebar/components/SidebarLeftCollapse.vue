@@ -1,43 +1,43 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { useGlobal } from "@pureadmin/utils";
-import { useNav } from "@/layout/hooks/useNav";
+import { computed } from 'vue'
+import { useGlobal } from '@pureadmin/utils'
+import { useNav } from '@/layout/hooks/useNav'
 
-import MenuFold from "~icons/ri/menu-fold-fill";
+import MenuFold from '~icons/ri/menu-fold-fill'
 
 interface Props {
-  isActive?: boolean;
+  isActive?: boolean
 }
 
 withDefaults(defineProps<Props>(), {
   isActive: false
-});
+})
 
-const { tooltipEffect } = useNav();
+const { tooltipEffect } = useNav()
 
 const iconClass = computed(() => {
   return [
-    "ml-4",
-    "mb-1",
-    "w-[16px]",
-    "h-[16px]",
-    "inline-block!",
-    "align-middle",
-    "cursor-pointer",
-    "duration-[100ms]"
-  ];
-});
+    'ml-4',
+    'mb-1',
+    'w-[16px]',
+    'h-[16px]',
+    'inline-block!',
+    'align-middle',
+    'cursor-pointer',
+    'duration-[100ms]'
+  ]
+})
 
-const { $storage } = useGlobal<GlobalPropertiesApi>();
-const themeColor = computed(() => $storage.layout?.themeColor);
+const { $storage } = useGlobal<GlobalPropertiesApi>()
+const themeColor = computed(() => $storage.layout?.themeColor)
 
 const emit = defineEmits<{
-  (e: "toggleClick"): void;
-}>();
+  (e: 'toggleClick'): void
+}>()
 
 const toggleClick = () => {
-  emit("toggleClick");
-};
+  emit('toggleClick')
+}
 </script>
 
 <template>

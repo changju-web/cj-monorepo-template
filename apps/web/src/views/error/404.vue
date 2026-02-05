@@ -1,18 +1,16 @@
 <script setup lang="ts">
-import { useRouter } from "vue-router";
-import noExist from "@/assets/status/404.svg?component";
+import { useRouter } from 'vue-router'
+import noExist from '@/assets/status/404.svg?component'
 
 defineOptions({
-  name: "404"
-});
+  name: '404'
+})
 
-const router = useRouter();
+const router = useRouter()
 </script>
 
 <template>
-  <div
-    class="flex flex-col md:flex-row justify-center items-center min-h-full w-full p-4 md:p-0"
-  >
+  <div class="flex flex-col md:flex-row justify-center items-center min-h-full w-full p-4 md:p-0">
     <noExist />
     <div class="mt-8 md:ml-12 md:mt-0 text-center md:text-left">
       <p

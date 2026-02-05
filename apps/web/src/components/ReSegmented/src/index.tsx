@@ -1,12 +1,7 @@
-import "./index.css";
-import type { OptionsType } from "./type";
-import { useRenderIcon } from "@/components/ReIcon/src/hooks";
-import {
-  useDark,
-  isNumber,
-  isFunction,
-  useResizeObserver
-} from "@pureadmin/utils";
+import './index.css'
+import type { OptionsType } from './type'
+import { useRenderIcon } from '@/components/ReIcon/src/hooks'
+import { useDark, isNumber, isFunction, useResizeObserver } from '@pureadmin/utils'
 import {
   type PropType,
   h,
@@ -16,7 +11,7 @@ import {
   nextTick,
   defineComponent,
   getCurrentInstance
-} from "vue";
+} from 'vue'
 
 const props = {
   options: {
@@ -27,7 +22,7 @@ const props = {
   modelValue: {
     type: undefined,
     require: false,
-    default: "0"
+    default: '0'
   },
   /** 将宽度调整为父元素宽度	 */
   block: {
@@ -36,7 +31,7 @@ const props = {
   },
   /** 控件尺寸 */
   size: {
-    type: String as PropType<"small" | "default" | "large">
+    type: String as PropType<'small' | 'default' | 'large'>
   },
   /** 是否全局禁用，默认 `false` */
   disabled: {
@@ -48,88 +43,82 @@ const props = {
     type: Boolean,
     default: false
   }
-};
+}
 
 export default defineComponent({
-  name: "ReSegmented",
+  name: 'ReSegmented',
   props,
-  emits: ["change", "update:modelValue"],
+  emits: ['change', 'update:modelValue'],
   setup(props, { emit }) {
-    const width = ref(0);
-    const translateX = ref(0);
-    const { isDark } = useDark();
-    const initStatus = ref(false);
-    const curMouseActive = ref(-1);
-    const segmentedItembg = ref("");
-    const instance = getCurrentInstance()!;
-    const curIndex = isNumber(props.modelValue)
-      ? toRef(props, "modelValue")
-      : ref(0);
+    const width = ref(0)
+    const translateX = ref(0)
+    const { isDark } = useDark()
+    const initStatus = ref(false)
+    const curMouseActive = ref(-1)
+    const segmentedItembg = ref('')
+    const instance = getCurrentInstance()!
+    const curIndex = isNumber(props.modelValue) ? toRef(props, 'modelValue') : ref(0)
 
     function handleChange({ option, index }, event: Event) {
-      if (props.disabled || option.disabled) return;
-      event.preventDefault();
-      isNumber(props.modelValue)
-        ? emit("update:modelValue", index)
-        : (curIndex.value = index);
-      segmentedItembg.value = "";
-      emit("change", { index, option });
+      if (props.disabled || option.disabled) return
+      event.preventDefault()
+      isNumber(props.modelValue) ? emit('update:modelValue', index) : (curIndex.value = index)
+      segmentedItembg.value = ''
+      emit('change', { index, option })
     }
 
     function handleMouseenter({ option, index }, event: Event) {
-      if (props.disabled) return;
-      event.preventDefault();
-      curMouseActive.value = index;
+      if (props.disabled) return
+      event.preventDefault()
+      curMouseActive.value = index
       if (option.disabled || curIndex.value === index) {
-        segmentedItembg.value = "";
+        segmentedItembg.value = ''
       } else {
-        segmentedItembg.value = isDark.value
-          ? "#1f1f1f"
-          : "rgba(0, 0, 0, 0.06)";
+        segmentedItembg.value = isDark.value ? '#1f1f1f' : 'rgba(0, 0, 0, 0.06)'
       }
     }
 
     function handleMouseleave(_, event: Event) {
-      if (props.disabled) return;
-      event.preventDefault();
-      curMouseActive.value = -1;
+      if (props.disabled) return
+      event.preventDefault()
+      curMouseActive.value = -1
     }
 
     function handleInit(index = curIndex.value) {
       nextTick(() => {
-        const curLabelRef = instance?.proxy?.$refs[`labelRef${index}`] as ElRef;
-        if (!curLabelRef) return;
-        width.value = curLabelRef.clientWidth;
-        translateX.value = curLabelRef.offsetLeft;
-        initStatus.value = true;
-      });
+        const curLabelRef = instance?.proxy?.$refs[`labelRef${index}`] as ElRef
+        if (!curLabelRef) return
+        width.value = curLabelRef.clientWidth
+        translateX.value = curLabelRef.offsetLeft
+        initStatus.value = true
+      })
     }
 
     function handleResizeInit() {
-      useResizeObserver(".pure-segmented", () => {
+      useResizeObserver('.pure-segmented', () => {
         nextTick(() => {
-          handleInit(curIndex.value);
-        });
-      });
+          handleInit(curIndex.value)
+        })
+      })
     }
 
-    (props.block || props.resize) && handleResizeInit();
+    ;(props.block || props.resize) && handleResizeInit()
 
     watch(
       () => curIndex.value,
-      index => {
+      (index) => {
         nextTick(() => {
-          handleInit(index);
-        });
+          handleInit(index)
+        })
       },
       {
         immediate: true
       }
-    );
+    )
 
     watch(() => props.size, handleResizeInit, {
       immediate: true
-    });
+    })
 
     const rendLabel = () => {
       return props.options.map((option, index) => {
@@ -137,25 +126,22 @@ export default defineComponent({
           <label
             ref={`labelRef${index}`}
             class={[
-              "pure-segmented-item",
-              (props.disabled || option?.disabled) &&
-                "pure-segmented-item-disabled"
+              'pure-segmented-item',
+              (props.disabled || option?.disabled) && 'pure-segmented-item-disabled'
             ]}
             style={{
-              background:
-                curMouseActive.value === index ? segmentedItembg.value : "",
+              background: curMouseActive.value === index ? segmentedItembg.value : '',
               color: props.disabled
                 ? null
-                : !option.disabled &&
-                    (curIndex.value === index || curMouseActive.value === index)
+                : !option.disabled && (curIndex.value === index || curMouseActive.value === index)
                   ? isDark.value
-                    ? "rgba(255, 255, 255, 0.85)"
-                    : "rgba(0,0,0,.88)"
-                  : ""
+                    ? 'rgba(255, 255, 255, 0.85)'
+                    : 'rgba(0,0,0,.88)'
+                  : ''
             }}
-            onMouseenter={event => handleMouseenter({ option, index }, event)}
-            onMouseleave={event => handleMouseleave({ option, index }, event)}
-            onClick={event => handleChange({ option, index }, event)}
+            onMouseenter={(event) => handleMouseenter({ option, index }, event)}
+            onMouseleave={(event) => handleMouseleave({ option, index }, event)}
+            onClick={(event) => handleChange({ option, index }, event)}
           >
             <input type="radio" name="segmented" />
             <div
@@ -168,7 +154,7 @@ export default defineComponent({
               {option.icon && !isFunction(option.label) ? (
                 <span
                   class="pure-segmented-item-icon"
-                  style={{ marginRight: option.label ? "6px" : 0 }}
+                  style={{ marginRight: option.label ? '6px' : 0 }}
                 >
                   {h(
                     useRenderIcon(option.icon, {
@@ -186,17 +172,17 @@ export default defineComponent({
               ) : null}
             </div>
           </label>
-        );
-      });
-    };
+        )
+      })
+    }
 
     return () => (
       <div
         class={{
-          "pure-segmented": true,
-          "pure-segmented-block": props.block,
-          "pure-segmented--large": props.size === "large",
-          "pure-segmented--small": props.size === "small"
+          'pure-segmented': true,
+          'pure-segmented-block': props.block,
+          'pure-segmented--large': props.size === 'large',
+          'pure-segmented--small': props.size === 'small'
         }}
       >
         <div class="pure-segmented-group">
@@ -205,12 +191,12 @@ export default defineComponent({
             style={{
               width: `${width.value}px`,
               transform: `translateX(${translateX.value}px)`,
-              display: initStatus.value ? "block" : "none"
+              display: initStatus.value ? 'block' : 'none'
             }}
           ></div>
           {rendLabel()}
         </div>
       </div>
-    );
+    )
   }
-});
+})
