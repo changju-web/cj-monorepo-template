@@ -4,7 +4,7 @@
 import type { AxiosError } from 'axios'
 import { defaultErrorStrategies } from '../strategies/error'
 import { mergeStrategy, isCompleteStrategy } from '../common/utils'
-import type { ErrorStrategyInput } from '../common/types'
+import type { ErrorStrategyInput, CompleteStrategy } from '../common/types'
 
 /**
  * 错误响应适配函数
@@ -43,7 +43,10 @@ export function adaptError<E = unknown, T = unknown>(
   customStrategies?: Record<string, ErrorStrategyInput<E, T>>
 ): E {
   // 1. 首先收集所有策略，使用数组保证顺序
-  const strategyList: Array<{ key: string; strategy: ErrorStrategyInput<E, T> }> = []
+  const strategyList: Array<{
+    key: string
+    strategy: CompleteStrategy<AxiosError<T>, E>
+  }> = []
 
   // 1.1 添加自定义策略（优先级高）
   const customKeys = Object.keys(customStrategies ?? {})
@@ -52,10 +55,12 @@ export function adaptError<E = unknown, T = unknown>(
     // 检查是否覆盖默认策略
     if (key in defaultErrorStrategies) {
       // 合并策略
-      const baseStrategy = defaultErrorStrategies[key as keyof typeof defaultErrorStrategies]
+      const baseStrategy = defaultErrorStrategies[
+        key as keyof typeof defaultErrorStrategies
+      ] as CompleteStrategy<AxiosError<T>, E>
       strategyList.push({
         key,
-        strategy: mergeStrategy(baseStrategy as any, customStrategy as any)
+        strategy: mergeStrategy<AxiosError<T>, E>(baseStrategy, customStrategy)
       })
     } else {
       // 新策略必须完整
@@ -64,7 +69,7 @@ export function adaptError<E = unknown, T = unknown>(
           `Error strategy "${key}" must provide both 'match' and 'handler' when adding new strategy`
         )
       }
-      strategyList.push({ key, strategy: customStrategy })
+      strategyList.push({ key, strategy: customStrategy as CompleteStrategy<AxiosError<T>, E> })
     }
   }
 
@@ -73,7 +78,9 @@ export function adaptError<E = unknown, T = unknown>(
     if (!customKeys.includes(key)) {
       strategyList.push({
         key,
-        strategy: defaultErrorStrategies[key as keyof typeof defaultErrorStrategies] as any
+        strategy: defaultErrorStrategies[
+          key as keyof typeof defaultErrorStrategies
+        ] as CompleteStrategy<AxiosError<T>, E>
       })
     }
   }
@@ -84,7 +91,7 @@ export function adaptError<E = unknown, T = unknown>(
     const shouldMatch = strategy.match !== undefined ? strategy.match(error) : true
     if (shouldMatch) {
       // 如果 handler 存在则使用，否则使用 fallback（返回原始错误）
-      return strategy.handler !== undefined ? strategy.handler(error) : (error as unknown as E)
+      return strategy.handler !== undefined ? strategy.handler(error) : (error as E)
     }
   }
 

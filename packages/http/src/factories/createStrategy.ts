@@ -2,7 +2,7 @@
  * 策略创建工厂函数
  */
 import type { AxiosResponse, AxiosError } from 'axios'
-import type { Strategy } from '../common/types'
+import type { StrategyConstructor } from '../common/types'
 
 /**
  * 创建通用策略对象
@@ -19,7 +19,7 @@ import type { Strategy } from '../common/types'
  * );
  * ```
  */
-export function createStrategy<P, H>(predicate: P, handler: H): Strategy<P, H> {
+export const createStrategy: StrategyConstructor<unknown> = (predicate, handler) => {
   return { match: predicate, handler }
 }
 
@@ -38,11 +38,8 @@ export function createStrategy<P, H>(predicate: P, handler: H): Strategy<P, H> {
  * );
  * ```
  */
-export function createSuccessStrategy<R = unknown, T = unknown>(
-  predicate: (response: AxiosResponse<T>) => boolean,
-  handler: (response: AxiosResponse<T>) => R
-): Strategy<(response: AxiosResponse<T>) => boolean, (response: AxiosResponse<T>) => R> {
-  return { match: predicate, handler }
+export const createSuccessStrategy: StrategyConstructor<AxiosResponse> = (predicate, handler) => {
+  return createStrategy(predicate, handler)
 }
 
 /**
@@ -60,9 +57,6 @@ export function createSuccessStrategy<R = unknown, T = unknown>(
  * );
  * ```
  */
-export function createErrorStrategy<E = unknown, T = unknown>(
-  predicate: (error: AxiosError<T>) => boolean,
-  handler: (error: AxiosError<T>) => E
-): Strategy<(error: AxiosError<T>) => boolean, (error: AxiosError<T>) => E> {
-  return { match: predicate, handler }
+export const createErrorStrategy: StrategyConstructor<AxiosError> = (predicate, handler) => {
+  return createStrategy(predicate, handler)
 }

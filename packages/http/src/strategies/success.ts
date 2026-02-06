@@ -1,8 +1,8 @@
 /**
  * 默认成功响应策略集
  */
-import type { AxiosResponse } from 'axios'
-import type { Strategy } from '../common/types'
+import type { SuccessStrategies } from '../common/types'
+import { createSuccessStrategy } from '../factories'
 
 /**
  * 默认成功响应策略集
@@ -11,23 +11,33 @@ export const defaultSuccessStrategies = {
   /**
    * 成功响应策略
    * 匹配条件: HTTP 状态码为 200
-   * 处理方式: 返回 response.data
+   * 处理方式: 返回 response
    */
-  success: {
-    match: <T>(response: AxiosResponse<T>) => response.status === 200,
-    handler: <T, R = unknown>(response: AxiosResponse<T>) => response.data as unknown as R
-  },
+  success: createSuccessStrategy(
+    (response) => response.status === 200,
+    (response) => response
+  ),
+
+  /**
+   * 响应数据为文件时，返回 Blob 对象
+   * 匹配条件: response.data instanceof Blob
+   * 处理方式: 返回 response
+   */
+  file: createSuccessStrategy(
+    (response) => response.data instanceof Blob,
+    (response) => response
+  ),
 
   /**
    * 兜底策略
    * 匹配条件: 总是匹配（作为最后一个策略）
    * 处理方式: 返回原始响应对象
    */
-  fallback: {
-    match: () => true,
-    handler: <T, R = unknown>(response: AxiosResponse<T>) => response as unknown as R
-  }
-} satisfies Record<string, Strategy<unknown, unknown>>
+  fallback: createSuccessStrategy(
+    () => true,
+    (response) => Promise.reject(response)
+  )
+} satisfies SuccessStrategies
 
 /**
  * 默认成功响应策略集类型

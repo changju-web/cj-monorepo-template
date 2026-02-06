@@ -7,13 +7,5 @@ export { defaultSuccessStrategies } from './success'
 export type { DefaultSuccessStrategies } from './success'
 
 // 错误响应策略
-export {
-  defaultErrorStrategies,
-  type ErrorResponse,
-  type HttpErrorResponse,
-  type NetworkErrorResponse,
-  type TimeoutErrorResponse,
-  type CanceledErrorResponse,
-  type UnknownErrorResponse
-} from './error'
+export { defaultErrorStrategies } from './error'
 export type { DefaultErrorStrategies } from './error'

@@ -4,7 +4,7 @@
 import type { AxiosResponse } from 'axios'
 import { defaultSuccessStrategies } from '../strategies/success'
 import { mergeStrategy, isCompleteStrategy } from '../common/utils'
-import type { SuccessStrategyInput } from '../common/types'
+import type { SuccessStrategyInput, CompleteStrategy } from '../common/types'
 
 /**
  * 成功响应适配函数
@@ -43,7 +43,10 @@ export function adaptSuccess<R = unknown, T = unknown>(
   customStrategies?: Record<string, SuccessStrategyInput<R, T>>
 ): R {
   // 1. 首先收集所有策略，使用数组保证顺序
-  const strategyList: Array<{ key: string; strategy: SuccessStrategyInput<R, T> }> = []
+  const strategyList: Array<{
+    key: string
+    strategy: CompleteStrategy<AxiosResponse<T>, R>
+  }> = []
 
   // 1.1 添加自定义策略（优先级高）
   const customKeys = Object.keys(customStrategies ?? {})
@@ -52,10 +55,12 @@ export function adaptSuccess<R = unknown, T = unknown>(
     // 检查是否覆盖默认策略
     if (key in defaultSuccessStrategies) {
       // 合并策略
-      const baseStrategy = defaultSuccessStrategies[key as keyof typeof defaultSuccessStrategies]
+      const baseStrategy = defaultSuccessStrategies[
+        key as keyof typeof defaultSuccessStrategies
+      ] as CompleteStrategy<AxiosResponse<T>, R>
       strategyList.push({
         key,
-        strategy: mergeStrategy(baseStrategy as any, customStrategy as any)
+        strategy: mergeStrategy<AxiosResponse<T>, R>(baseStrategy, customStrategy)
       })
     } else {
       // 新策略必须完整
@@ -64,7 +69,7 @@ export function adaptSuccess<R = unknown, T = unknown>(
           `Strategy "${key}" must provide both 'match' and 'handler' when adding new strategy`
         )
       }
-      strategyList.push({ key, strategy: customStrategy })
+      strategyList.push({ key, strategy: customStrategy as CompleteStrategy<AxiosResponse<T>, R> })
     }
   }
 
@@ -73,7 +78,9 @@ export function adaptSuccess<R = unknown, T = unknown>(
     if (!customKeys.includes(key)) {
       strategyList.push({
         key,
-        strategy: defaultSuccessStrategies[key as keyof typeof defaultSuccessStrategies] as any
+        strategy: defaultSuccessStrategies[
+          key as keyof typeof defaultSuccessStrategies
+        ] as CompleteStrategy<AxiosResponse<T>, R>
       })
     }
   }
@@ -84,9 +91,7 @@ export function adaptSuccess<R = unknown, T = unknown>(
     const shouldMatch = strategy.match !== undefined ? strategy.match(response) : true
     if (shouldMatch) {
       // 如果 handler 存在则使用，否则使用 fallback（返回原始响应）
-      return strategy.handler !== undefined
-        ? strategy.handler(response)
-        : (response as unknown as R)
+      return strategy.handler !== undefined ? strategy.handler(response) : (response as R)
     }
   }
 

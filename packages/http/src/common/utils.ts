@@ -1,7 +1,7 @@
 /**
  * 通用工具函数
  */
-import type { Strategy, PartialStrategy, StrategyInput } from './types'
+import type { Strategy, StrategyInput } from './types'
 
 /**
  * 合并策略：将自定义策略与基础策略合并
@@ -32,19 +32,19 @@ import type { Strategy, PartialStrategy, StrategyInput } from './types'
  * // merged2 === full
  * ```
  */
-export function mergeStrategy<P, H>(
-  base: Strategy<P, H>,
-  override: StrategyInput<P, H>
-): Strategy<P, H> {
+export function mergeStrategy<T, R>(
+  base: Strategy<T, R>,
+  override: StrategyInput<T, R>
+): Strategy<T, R> {
   // 如果 override 是完整的（两者都有），直接返回
   if (override.match !== undefined && override.handler !== undefined) {
-    return override as Strategy<P, H>
+    return { match: override.match, handler: override.handler }
   }
 
   // 否则进行属性级合并
   return {
-    match: override.match ?? base.match,
-    handler: override.handler ?? base.handler
+    match: override.match !== undefined ? override.match : base.match,
+    handler: override.handler !== undefined ? override.handler : base.handler
   }
 }
 
@@ -63,6 +63,6 @@ export function mergeStrategy<P, H>(
  * isCompleteStrategy(partial); // false
  * ```
  */
-export function isCompleteStrategy<P, H>(input: StrategyInput<P, H>): input is Strategy<P, H> {
+export function isCompleteStrategy<T, R>(input: StrategyInput<T, R>): input is Strategy<T, R> {
   return input.match !== undefined && input.handler !== undefined
 }
